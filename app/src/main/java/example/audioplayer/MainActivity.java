@@ -178,7 +178,7 @@ public class MainActivity extends ListActivity {
     private View.OnClickListener onButtonClick = new View.OnClickListener() {
 
         @Override
-        public void OnClick(View v) {
+        public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.play: {
                     if (player.isPlaying()) {
@@ -201,7 +201,7 @@ public class MainActivity extends ListActivity {
 
     private MediaPlayer.OnCompletionListener onCompletion = new MediaPlayer.OnCompletionListener() {
         @Override
-        public void OnCompletion(MediaPlayer mp) {
+        public void onCompletion(MediaPlayer mp) {
             stopPlay();
         }
     };
