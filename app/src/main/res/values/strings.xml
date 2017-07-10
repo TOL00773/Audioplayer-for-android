@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">AudioPlayer</string>
+    <string name="not_file_select">Not file select</string>
+</resources>
