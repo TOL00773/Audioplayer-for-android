@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -30,12 +31,17 @@ public class MainActivity extends ListActivity {
 
     private MediaCursorAdapter mediaAdapter = null;
     private TextView selectedFile = null;
+    private SeekBar seekbar = null;
     private MediaPlayer player = null;
     private ImageButton playButton = null;
-
+    private ImageButton prevButton = null;
+    private ImageButton nextButton = null;
+    private ImageButton rewButton = null;
+    private ImageButton ffButton = null;
 
     private boolean isStarted = true;
     private String currentFile = "";
+    private boolean isMoveingSeekBar = false;
 
     private final Handler handler = new Handler();
 
@@ -52,12 +58,18 @@ public class MainActivity extends ListActivity {
         setContentView(R.layout.main);
 
         selectedFile = (TextView) findViewById(R.id.selectedfile);
+        seekbar = (SeekBar) findViewById(R.id.seekbar);
         playButton = (ImageButton) findViewById(R.id.play);
+        prevButton = (ImageButton) findViewById(R.id.prev);
+        nextButton = (ImageButton) findViewById(R.id.next);
+        rewButton = (ImageButton) findViewById(R.id.rew);
+        ffButton = (ImageButton) findViewById(R.id.ff);
 
         player = new MediaPlayer();
 
         player.setOnCompletionListener(onCompletion);
         player.setOnErrorListener(onError);
+        seekbar.setOnSeekBarChangeListener(seekBarChanged);
 
         Cursor cursor = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 null, null, null, null);
@@ -70,7 +82,10 @@ public class MainActivity extends ListActivity {
             setListAdapter(mediaAdapter);
 
             playButton.setOnClickListener(onButtonClick);
-
+            prevButton.setOnClickListener(onButtonClick);
+            nextButton.setOnClickListener(onButtonClick);
+            rewButton.setOnClickListener(onButtonClick);
+            ffButton.setOnClickListener(onButtonClick);
 
         }
     }
@@ -131,6 +146,8 @@ public class MainActivity extends ListActivity {
 
     private void updatePosition() {
         handler.removeCallbacks(updatePositionRunnable);
+
+
         handler.postDelayed(updatePositionRunnable, UPDATE_FREQUENCY);
     }
 
@@ -170,7 +187,9 @@ public class MainActivity extends ListActivity {
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
             LayoutInflater inflater = LayoutInflater.from(context);
             View v = inflater.inflate(R.layout.listitem, parent, false);
+
             bindView(v, context, cursor);
+
             return v;
         }
     }
@@ -195,6 +214,32 @@ public class MainActivity extends ListActivity {
                     }
                     break;
                 }
+                case R.id.next: {
+                    int seekto = player.getCurrentPosition() + STEP_VALUE;
+
+                    if (seekto > player.getDuration())
+                        seekto = player.getDuration();
+
+                    player.pause();
+                    player.seekTo(seekto);
+                    player.start();
+
+                    break;
+                }
+                case R.id.prev: {
+                    int seekto = player.getCurrentPosition() - STEP_VALUE;
+
+                    if (seekto < 0)
+                        seekto = 0;
+
+                    player.pause();
+                    player.seekTo(seekto);
+                    player.start();
+
+                    break;
+                }
+                //case
+                //case
             }
         }
     };
