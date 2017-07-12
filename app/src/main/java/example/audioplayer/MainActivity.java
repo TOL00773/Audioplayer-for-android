@@ -129,6 +129,7 @@ public class MainActivity extends ListActivity {
             e.printStackTrace();
         }
 
+        seekbar.setMax(player.getDuration());
         playButton.setImageResource(android.R.drawable.ic_media_pause);
 
         updatePosition();
@@ -255,6 +256,27 @@ public class MainActivity extends ListActivity {
         @Override
         public boolean onError(MediaPlayer mp, int what, int extra) {
             return false;
+        }
+    };
+
+    private SeekBar.OnSeekBarChangeListener seekBarChanged = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar){
+            isMoveingSeekBar = false;
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar){
+            isMoveingSeekBar = true;
+        }
+
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+            if (isMoveingSeekBar){
+                player.seekTo(progress);
+
+                Log.i("OnSeekBarChangeListener", "onProgressChanged");
+            }
         }
     };
 }

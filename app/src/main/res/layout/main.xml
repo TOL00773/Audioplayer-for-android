@@ -46,15 +46,16 @@
             android:gravity="center"
             android:orientation="horizontal">
 
+            <ImageButton android:id="@+id/prev"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_media_previous"/>
+
             <ImageButton android:id="@+id/rew"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@android:drawable/ic_media_rew"/>
 
-            <ImageButton android:id="@+id/prev"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@android:drawable/ic_media_previous"/>
 
             <ImageButton
                 android:id="@+id/play"
@@ -62,15 +63,15 @@
                 android:layout_height="wrap_content"
                 android:src="@android:drawable/ic_media_play" />
 
-            <ImageButton android:id="@+id/next"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@android:drawable/ic_media_next"/>
-
             <ImageButton android:id="@+id/ff"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@android:drawable/ic_media_ff"/>
+
+            <ImageButton android:id="@+id/next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_media_next"/>
 
         </LinearLayout>
     </LinearLayout>
