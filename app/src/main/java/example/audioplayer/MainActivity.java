@@ -1,14 +1,20 @@
-package example.audioplayer;
+package example.audioplayer;         //264 строка
 
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.ContentUris;
 import android.database.Cursor;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnPreparedListener;
+import android.view.KeyEvent;
 import android.os.Handler;
 import android.preference.PreferenceActivity;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.widget.ThemedSpinnerAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +26,9 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -36,8 +45,8 @@ public class MainActivity extends ListActivity {
     private ImageButton playButton = null;
     private ImageButton prevButton = null;
     private ImageButton nextButton = null;
-    private ImageButton rewButton = null;
-    private ImageButton ffButton = null;
+    private ImageButton mute= null;
+    private ImageButton unmute= null;
 
     private boolean isStarted = true;
     private String currentFile = "";
@@ -51,19 +60,23 @@ public class MainActivity extends ListActivity {
         }
     };
 
+    AudioManager am;
+    CheckBox loop;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         selectedFile = (TextView) findViewById(R.id.selectedfile);
         seekbar = (SeekBar) findViewById(R.id.seekbar);
         playButton = (ImageButton) findViewById(R.id.play);
         prevButton = (ImageButton) findViewById(R.id.prev);
         nextButton = (ImageButton) findViewById(R.id.next);
-        rewButton = (ImageButton) findViewById(R.id.rew);
-        ffButton = (ImageButton) findViewById(R.id.ff);
+        mute = (ImageButton) this.findViewById(R.id.mute);
+        unmute = (ImageButton) this.findViewById(R.id.unmute);
+        loop = (CheckBox)  findViewById(R.id.loop);
 
         player = new MediaPlayer();
 
@@ -84,11 +97,69 @@ public class MainActivity extends ListActivity {
             playButton.setOnClickListener(onButtonClick);
             prevButton.setOnClickListener(onButtonClick);
             nextButton.setOnClickListener(onButtonClick);
-            rewButton.setOnClickListener(onButtonClick);
-            ffButton.setOnClickListener(onButtonClick);
 
         }
+
+        am = (AudioManager) getSystemService(AUDIO_SERVICE);
+        loop.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+        public void onCheckedChanged(CompoundButton buttonView,
+        boolean isChecked) {
+                if (player != null)
+                    player.setLooping(isChecked);
+            }
+    });
+
+        int app_volume;
+
+        AudioManager audioManager2 = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        app_volume = audioManager2.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+        if(app_volume == 0){
+            mute.setVisibility(View.INVISIBLE);
+            unmute.setVisibility(View.VISIBLE);
+        }
+        else{
+            mute.setVisibility(View.VISIBLE);
+            unmute.setVisibility(View.INVISIBLE);
+        }
     }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+
+            mute.setVisibility(View.VISIBLE);
+            unmute.setVisibility(View.INVISIBLE);
+            return true;
+
+        }
+
+
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+
+            int app_volume;
+            AudioManager audioManager2 = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            app_volume = audioManager2.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+            if (app_volume == 0) {
+
+                mute.setVisibility(View.INVISIBLE);
+                unmute.setVisibility(View.VISIBLE);
+
+            } else {
+
+                mute.setVisibility(View.VISIBLE);
+                unmute.setVisibility(View.INVISIBLE);
+
+            }
+            ;
+
+            return true;
+        }
+    }
+
 
     @Override
     protected void onListItemClick(ListView list, View view, int position, long id) {
@@ -119,6 +190,7 @@ public class MainActivity extends ListActivity {
 
         try {
             player.setDataSource(file);
+            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
             player.prepare();
             player.start();
         } catch (IllegalArgumentException e) {
@@ -239,9 +311,25 @@ public class MainActivity extends ListActivity {
 
                     break;
                 }
-                //case
-                //case
+                case R.id.mute: {
+                    AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
+                    mute.setVisibility(View.INVISIBLE);
+                    unmute.setVisibility(View.VISIBLE);
+                }
+                case R.id.unmute: {
+                    AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 90, 90);
+                    mute.setVisibility(View.VISIBLE);
+                    unmute.setVisibility(View.INVISIBLE);
+                    }
             }
+
+            if (player == null)
+                return;
+
+            player.setLooping(loop.isChecked());//нужно переставить эти 2 строки туда, где будет переход от одной песни к другой
+            player.setOnCompletionListener(this);// чтобы "this" говорил, что данная песня будет прокручиваться заново и перехода не случиться.
         }
     };
 
