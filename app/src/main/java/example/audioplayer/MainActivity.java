@@ -1,4 +1,4 @@
-package example.audioplayer;         //264 строка
+package example.audioplayer;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -154,11 +154,10 @@ public class MainActivity extends ListActivity {
                 unmute.setVisibility(View.INVISIBLE);
 
             }
-            ;
+
         }
         return true;
     }
-
 
     @Override
     protected void onListItemClick(ListView list, View view, int position, long id) {
@@ -189,7 +188,6 @@ public class MainActivity extends ListActivity {
 
         try {
             player.setDataSource(file);
-            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
             player.prepare();
             player.start();
         } catch (IllegalArgumentException e) {
