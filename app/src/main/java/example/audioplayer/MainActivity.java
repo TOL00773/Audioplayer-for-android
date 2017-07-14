@@ -155,9 +155,8 @@ public class MainActivity extends ListActivity {
 
             }
             ;
-
-            return true;
         }
+        return true;
     }
 
 
@@ -324,12 +323,6 @@ public class MainActivity extends ListActivity {
                     unmute.setVisibility(View.INVISIBLE);
                     }
             }
-
-            if (player == null)
-                return;
-
-            player.setLooping(loop.isChecked());//нужно переставить эти 2 строки туда, где будет переход от одной песни к другой
-            player.setOnCompletionListener(this);// чтобы "this" говорил, что данная песня будет прокручиваться заново и перехода не случиться.
         }
     };
 
