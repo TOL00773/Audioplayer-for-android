@@ -2,7 +2,6 @@ package example.audioplayer;
 
 import android.app.ListActivity;
 import android.content.Context;
-import android.content.ContentUris;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -10,17 +9,12 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.view.KeyEvent;
 import android.os.Handler;
-import android.preference.PreferenceActivity;
 import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.v7.widget.ThemedSpinnerAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SeekBar;
@@ -33,7 +27,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import java.io.IOException;
 import java.math.BigDecimal;
 
-public class MainActivity extends ListActivity {
+public class MainActivity extends ListActivity implements OnPreparedListener, OnCompletionListener {
 
     private static final int UPDATE_FREQUENCY = 500;
     private static final int STEP_VALUE = 4000;
@@ -45,8 +39,8 @@ public class MainActivity extends ListActivity {
     private ImageButton playButton = null;
     private ImageButton prevButton = null;
     private ImageButton nextButton = null;
-    private ImageButton mute= null;
-    private ImageButton unmute= null;
+    private ImageButton mute;
+    private ImageButton unmute;
 
     private boolean isStarted = true;
     private String currentFile = "";
@@ -76,7 +70,7 @@ public class MainActivity extends ListActivity {
         nextButton = (ImageButton) findViewById(R.id.next);
         mute = (ImageButton) this.findViewById(R.id.mute);
         unmute = (ImageButton) this.findViewById(R.id.unmute);
-        loop = (CheckBox)  findViewById(R.id.loop);
+        loop = (CheckBox) findViewById(R.id.loop);
 
         player = new MediaPlayer();
 
@@ -103,23 +97,21 @@ public class MainActivity extends ListActivity {
         am = (AudioManager) getSystemService(AUDIO_SERVICE);
         loop.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
-        public void onCheckedChanged(CompoundButton buttonView,
-        boolean isChecked) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (player != null)
                     player.setLooping(isChecked);
             }
-    });
+        });
 
         int app_volume;
 
         AudioManager audioManager2 = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         app_volume = audioManager2.getStreamVolume(AudioManager.STREAM_MUSIC);
 
-        if(app_volume == 0){
+        if (app_volume == 0) {
             mute.setVisibility(View.INVISIBLE);
             unmute.setVisibility(View.VISIBLE);
-        }
-        else{
+        } else {
             mute.setVisibility(View.VISIBLE);
             unmute.setVisibility(View.INVISIBLE);
         }
@@ -226,8 +218,6 @@ public class MainActivity extends ListActivity {
             super(context, layout, cursor,
                     new String[]{MediaStore.MediaColumns.DISPLAY_NAME, MediaStore.MediaColumns.TITLE, MediaStore.Audio.AudioColumns.DURATION},
                     new int[]{R.id.displayname, R.id.title, R.id.duration});
-
-
         }
 
         @Override
@@ -319,7 +309,7 @@ public class MainActivity extends ListActivity {
                     audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 90, 90);
                     mute.setVisibility(View.VISIBLE);
                     unmute.setVisibility(View.INVISIBLE);
-                    }
+                }
             }
         }
     };
@@ -340,26 +330,35 @@ public class MainActivity extends ListActivity {
 
     private SeekBar.OnSeekBarChangeListener seekBarChanged = new SeekBar.OnSeekBarChangeListener() {
         @Override
-        public void onStopTrackingTouch(SeekBar seekBar){
+        public void onStopTrackingTouch(SeekBar seekBar) {
             isMoveingSeekBar = false;
         }
 
         @Override
-        public void onStartTrackingTouch(SeekBar seekBar){
+        public void onStartTrackingTouch(SeekBar seekBar) {
             isMoveingSeekBar = true;
         }
 
         @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
-            if (isMoveingSeekBar){
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            if (isMoveingSeekBar) {
                 player.seekTo(progress);
 
                 Log.i("OnSeekBarChangeListener", "onProgressChanged");
             }
         }
     };
-}
 
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        mp.start();
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+
+    }
+}
 
 
 
